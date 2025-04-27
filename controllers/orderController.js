@@ -31,9 +31,11 @@ export async function createOrder(req, res) {
 
   const order = new Order({
     orderId: orderId,
+    email: req.user.email,
     name: orderInfo.name,
     address: orderInfo.address,
     total: 0,
+    phone: orderInfo.phone,
     products: [],
   });
 
