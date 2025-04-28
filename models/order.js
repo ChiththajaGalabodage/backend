@@ -22,6 +22,10 @@ const orderSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  labelledTotal: {
+    type: Number,
+    required: true,
+  },
   status: {
     type: String,
     required: true,
