@@ -48,8 +48,8 @@ mongoose
   });
 
 app.use("/api/products", productRouter);
-app.use("api/users", userRouter);
-app.use("api/orders", orderRouter);
+app.use("/api/users", userRouter);
+app.use("/api/orders", orderRouter);
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
