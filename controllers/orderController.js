@@ -1,5 +1,6 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
+import { isAdmin } from "./userController.js";
 
 export async function createOrder(req, res) {
   if (req.user == null) {
@@ -137,7 +138,7 @@ export async function updateOrderStatus(req, res) {
     await Order.updateOne(
       {
         orderId: orderId,
-      },
+      }, 
       {
         status: status,
       }
