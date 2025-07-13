@@ -10,5 +10,6 @@ const userRouter = express.Router();
 userRouter.post("/", createUser);
 userRouter.post("/login", loginUser);
 userRouter.post("/login/google", loginWithGoogle);
+userRouter.post("/send-otp", sendOTP);
 
 export default userRouter;

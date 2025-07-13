@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import axios from "axios";
+import nodemailer from "nodemailer";
 dotenv.config();
 
 export function createUser(req, res) {
@@ -147,6 +148,41 @@ export async function loginWithGoogle(req, res) {
       role: user.role,
     });
   }
+}
+const transport = nodemailer.createTransport({
+  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: "sathsaracsg@gmail.com",
+    pass: "lafi klyv hegd aliz",
+  },
+});
+export async function sendOTP(req, res) {
+  //lafi klyv hegd aliz
+  const randomOTP = Math.floor(100000 + Math.random() * 900000);
+  const email = req.body.email;
+  if (email == null) {
+    res.status(400).json({ message: "Email is required" });
+    return;
+  }
+  transport.sendMail(
+    "This your password reset OTP: " + randomOTP,
+    (error, info) => {
+      if (error) {
+        res.status(500).json({
+          message: "Failed to send OTP",
+          error: error,
+        });
+      } else {
+        res.json({
+          message: "OTP sent successfully",
+          otp: randomOTP,
+        });
+      }
+    }
+  );
 }
 export function isAdmin(req) {
   if (req.user == null) {
