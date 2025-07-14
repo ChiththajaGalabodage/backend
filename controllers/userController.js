@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import axios from "axios";
 import nodemailer from "nodemailer";
+import OTP from "../models/otp.js";
 dotenv.config();
 
 export function createUser(req, res) {
@@ -167,8 +168,28 @@ export async function sendOTP(req, res) {
     res.status(400).json({ message: "Email is required" });
     return;
   }
+  const user = await User.findOne({ email: email });
+  if (user == null) {
+    res.status(404).json({ message: "User not found" });
+  }
+  //delete all otps
+  await OTP.deleteMany({ email: email });
+
+  const message = {
+    from: "sathsaracsg@gmail.com",
+    to: email,
+    subject: "Resetting password for crystal beauty clear.",
+    text: `Your OTP for resetting password is ${randomOTP}`,
+  };
+
+  const otp = new OTP({
+    email: email,
+    otp: randomOTP,
+  });
+  await otp.save();
   transport.sendMail(
-    "This your password reset OTP: " + randomOTP,
+    message,
+
     (error, info) => {
       if (error) {
         res.status(500).json({
@@ -183,6 +204,40 @@ export async function sendOTP(req, res) {
       }
     }
   );
+}
+export async function resetPassword(req, res) {
+  const otp = req.body.otp;
+  const email = req.body.email;
+  const newPassword = req.body.newPassword;
+
+  const response = await OTP.findOne({
+    email: email,
+  });
+
+  if (response == null) {
+    res.status(500).json({
+      message: "No otp requestes found please try again",
+    });
+    return;
+  }
+  if (otp == response.otp) {
+    await OTP.deleteMany({ email: email });
+
+    const hashedPassword = bcrypt.hashSync(newPassword, 10);
+    const response2 = User.updateOne(
+      { email: email },
+      {
+        password: hashedPassword,
+      }
+    );
+    res.json({
+      message: "password has been reset successfully",
+    });
+  } else {
+    res.status(403).json({
+      message: "OTPs are not matching",
+    });
+  }
 }
 export function isAdmin(req) {
   if (req.user == null) {
