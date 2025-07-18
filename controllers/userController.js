@@ -25,10 +25,6 @@ export function createUser(req, res) {
     }
   }
 
-  /*User.find().then((data) => {
-    res.json(data);
-  }); */
-
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
 
   const user = new User({
@@ -240,10 +236,10 @@ export async function resetPassword(req, res) {
   }
 }
 
-export function getUser(res, req) {
+export function getUser(req, res) {
   if (req.user == null) {
     res.status(403).json({
-      message: "You are not authorized to get user details",
+      message: "You are not authorized to view user details",
     });
     return;
   } else {
