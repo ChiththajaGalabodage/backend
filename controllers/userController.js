@@ -242,10 +242,6 @@ export async function getUser(req, res) {
       message: "You are not authorized to view user details",
     });
     return;
-    if (isAdmin(req)) {
-      const users = await User.find();
-      res.json(users);
-    }
   } else {
     res.json({
       ...req.user,
@@ -260,4 +256,26 @@ export function isAdmin(req) {
     return false;
   }
   return true;
+}
+
+export async function getAllUser(req, res) {
+  try {
+    // If req.user is admin → return all users
+    if (req.user && req.user.role === "admin") {
+      const users = await User.find({}, "-password"); // exclude password
+      return res.json(users);
+    }
+
+    // If normal user → return only their own details
+    if (req.user) {
+      return res.json(req.user);
+    }
+
+    // If no authentication → unauthorized
+    res
+      .status(403)
+      .json({ message: "You are not authorized to view user details" });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching users", error });
+  }
 }
