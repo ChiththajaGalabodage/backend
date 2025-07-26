@@ -236,12 +236,16 @@ export async function resetPassword(req, res) {
   }
 }
 
-export function getUser(req, res) {
+export async function getUser(req, res) {
   if (req.user == null) {
     res.status(403).json({
       message: "You are not authorized to view user details",
     });
     return;
+    if (isAdmin(req)) {
+      const users = await User.find();
+      res.json(users);
+    }
   } else {
     res.json({
       ...req.user,
